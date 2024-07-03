@@ -1,0 +1,93 @@
+CHAT APPLICATION PROTOCOL
+TUJUAN: melayani client dalam request chat aplikasi
+
+ATURAN PROTOKOL:
+- client harus mengirimkan request dalam bentuk string
+- string harus dalam format
+  REQUEST spasi PARAMETER
+- PARAMETER dapat berkembang menjadi PARAMETER1 spasi PARAMETER2 dan seterusnya
+
+REQUEST YANG DILAYANI:
+- informasi umum:
+  * Jika request tidak dikenali akan menghasilkan pesan
+    - status: ERROR
+    - data: request tidak dikenali
+  * Semua result akan diberikan dalam bentuk JSON dan diakhiri
+    dengan character ascii code #13#10#13#10 atau "\r\n\r\n"
+
+AUTH
+* TUJUAN: untuk autentikasi pengguna
+* PARAMETER:
+  - PARAMETER1 : username
+  - PARAMETER2 : password
+* RESULT:
+- BERHASIL:
+  - status: OK
+  - data: autentikasi berhasil
+- GAGAL:
+  - status: ERROR
+  - data: autentikasi gagal
+
+LOGOUT
+* TUJUAN: untuk keluar dari akun pengguna
+* PARAMETER: tidak ada
+* RESULT:
+- BERHASIL:
+  - status: OK
+  - data: logout berhasil
+- GAGAL:
+  - status: ERROR
+  - data: logout gagal
+
+SEND
+* TUJUAN: untuk mengirim pesan pribadi ke pengguna lain
+* PARAMETER:
+  - PARAMETER1 : username penerima
+  - PARAMETER2 : pesan
+* RESULT:
+- BERHASIL:
+  - status: OK
+  - data: pesan terkirim
+- GAGAL:
+  - status: ERROR
+  - data: pesan tidak terkirim
+
+SEND_GROUP
+* TUJUAN: untuk mengirim pesan ke grup chat
+* PARAMETER:
+  - PARAMETER1 : nama grup
+  - PARAMETER2 : pesan
+* RESULT:
+- BERHASIL:
+  - status: OK
+  - data: pesan terkirim
+- GAGAL:
+  - status: ERROR
+  - data: pesan tidak terkirim
+
+SEND_FILE
+* TUJUAN: untuk mengirim file pribadi ke pengguna lain
+* PARAMETER:
+  - PARAMETER1 : username penerima
+  - PARAMETER2 : nama file
+* RESULT:
+- BERHASIL:
+  - status: OK
+  - data: file terkirim
+- GAGAL:
+  - status: ERROR
+  - data: file tidak terkirim
+
+SEND_GROUP_FILE
+* TUJUAN: untuk mengirim file ke grup chat
+* PARAMETER:
+  - PARAMETER1 : nama grup
+  - PARAMETER2 : nama file
+* RESULT:
+- BERHASIL:
+  - status: OK
+  - data: file terkirim
+- GAGAL:
+  - status: ERROR
+  - data: file tidak terkirim
+
