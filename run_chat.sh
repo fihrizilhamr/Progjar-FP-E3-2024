@@ -1,10 +1,10 @@
-# Run in 60001/60002/60003
+#!/bin/sh
 
-pip install flet
 sudo apt update -y
+sudo apt install pip
+pip install flet
 sudo apt install libmpv1 -y
 python3 server_thread_chat.py &
-python3 chat_flet.py
+python3 chat_flet_group.py
 
-
-# Open in 50001/50002/50003
+# Open 50001/50002/50003
