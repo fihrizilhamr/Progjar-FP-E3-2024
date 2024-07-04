@@ -63,6 +63,13 @@ class ChatClient:
             elif (command=='list_group'):
                 groupname = j[1].strip()
                 return self.list_group(groupname)
+            
+            elif (command=='list_my_groups'):
+                return self.list_my_groups()
+            
+            elif (command=='list_users'):
+                return self.list_users()
+            
             elif (command=='get_group'):
                 return self.get_groups()
 
@@ -181,6 +188,22 @@ class ChatClient:
         result = self.send_string(string)
         return "{}".format(result['message'])
     
+    def list_users(self):
+        if self.tokenid == "":
+            return "Error, not authorized"
+        string="list_users\r\n"
+        result = self.send_string(string)
+        return result
+    
+    def list_my_groups(self):
+        if self.tokenid == "":
+            return "Error, not authorized"
+        string="list_my_groups {}\r\n".format(self.tokenid)
+        result = self.send_string(string)
+        return result
+
+
+
     def list_group(self, groupname):
         if self.tokenid == "":
             return "Error, not authorized"

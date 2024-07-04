@@ -120,6 +120,27 @@ class Chat:
 				logging.warning("SET: realm become {}".format(self.current_realm))
 				return self._safe_json_dumps(self.current_realm)
 
+			elif command == 'list_users':
+				list_users = []
+				for user_name, user_info in self.users.items():
+					list_users.append(user_name+"@"+user_info['realm'])
+				logging.warning("LISTUSERS: server data: users={}".format(list_users))
+				return list_users
+			
+			elif command == 'list_my_groups':
+				sessionid = j[1].strip()
+				usernamefrom = self.sessions[sessionid]['username']
+				user_test = usernamefrom + "@" + self.get_user(usernamefrom)['realm']
+				
+				my_groups = []
+				
+				for group_name, group_info in self.groups.items():
+					if user_test in group_info['members']:
+						my_groups.append(group_name)
+				logging.warning("LISTMYGROUPS: server data: users={} groups={}".format(user_test, my_groups))
+				return my_groups
+
+			
 			elif (command=='add_realm'):
 				server_name = j[1].strip()
 				server_ip = j[2].strip()
