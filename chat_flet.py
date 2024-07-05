@@ -1,5 +1,7 @@
 from chat_client import *
 import flet as ft
+import base64
+import json
 
 TARGET_IP = os.getenv("SERVER_IP") or "127.0.0.1"
 TARGET_PORT = os.getenv("SERVER_PORT") or "8889"
@@ -217,7 +219,9 @@ def main(page: ft.Page):
                     private_chat_receiver,
                     private_chat_message,
                     private_chat_send_button
-                ]
+                ],
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                alignment=ft.MainAxisAlignment.CENTER,
             )
         )
 
@@ -231,7 +235,9 @@ def main(page: ft.Page):
                     private_chat_receiver_file,
                     private_chat_file,
                     private_chat_send_file_button
-                ]
+                ],
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                alignment=ft.MainAxisAlignment.CENTER,
             ),
             visible=False
         )
@@ -299,7 +305,9 @@ def main(page: ft.Page):
                     group_chat_name,
                     group_chat_message,
                     group_chat_send_button
-                ]
+                ],
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                alignment=ft.MainAxisAlignment.CENTER,
             )
         )
 
@@ -313,7 +321,9 @@ def main(page: ft.Page):
                     group_chat_name_file,
                     group_chat_file,
                     group_chat_send_file_button
-                ]
+                ],
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                alignment=ft.MainAxisAlignment.CENTER,
             ),
             visible=False
         )
@@ -352,7 +362,116 @@ def main(page: ft.Page):
         lv.controls.append(ft.Text(f"Server response: {response}"))
         page.update()
 
+    def parse_inbox(data):
+        parsed_data = json.loads(data)
+        private_messages = []
+        group_messages = []
 
+        for user, messages in parsed_data.items():
+            for msg in messages:
+                if "group" in msg:
+                    group_messages.append(msg)
+                else:
+                    private_messages.append(msg)
+
+        return private_messages, group_messages
+
+    def display_inbox_view():
+        inbox_data = cc.proses(f"inbox")
+        private_messages, group_messages = parse_inbox(inbox_data)
+
+        def create_message_view(msg):
+            controls = [
+                ft.Text(f"From: {msg['msg_from']}", style="subtitle1"),
+                ft.Text(f"Realm From: {msg['realm_from']}", style="subtitle2"),
+                ft.Text(f"To: {msg['msg_to']}", style="subtitle1"),
+                ft.Text(f"Realm To: {msg['realm_to']}", style="subtitle2")
+            ]
+
+            if "msg" in msg:
+                controls.append(ft.Text(f"Message: {msg['msg']}", style="body1"))
+
+            if "filename" in msg and "filecontent" in msg:
+                try:
+                    image = ft.Image(
+                        src_base64=f"{msg['filecontent']}",
+                        width=300,
+                        height=300,
+                        fit=ft.ImageFit.CONTAIN
+                    )
+                    controls.append(ft.Text(f"Filename: {msg['filename']}", style="subtitle2"))
+                    controls.append(image)
+                except Exception as e:
+                    controls.append(ft.Text(f"Error displaying file: {e}", style="body2"))
+
+            return ft.Column(controls, spacing=10)
+
+        def create_chat_view(messages, title):
+            message_views = [
+                ft.Card(
+                    content=ft.Column(
+                        [
+                            ft.Text(msg['msg_from'] if 'msg_from' in msg else "Unknown", style="headlineSmall"),
+                            create_message_view(msg)
+                        ],
+                        
+                        spacing=10,
+                    ),
+                    margin=10,
+                    elevation=3
+                )
+                for msg in messages
+            ]
+            return ft.ListView(
+                message_views,
+                spacing=10,
+                padding=10,
+                auto_scroll=True,  
+                # expand=True
+            )
+
+        page.clean()
+        page.add(
+            ft.Column(
+                [
+                    ft.Row([ft.Text("Chat Application", style="headlineMedium"), ft.Row([help_icon, theme_toggle])], alignment="spaceBetween"),
+                    ft.ElevatedButton("Back", on_click=lambda e: show_chat_view()),
+                    ft.Container(
+                        content=ft.Column(
+                            [
+                                ft.Text("Private Messages", style="headlineMedium"),
+                                create_chat_view(private_messages, "Private Messages")
+                            ],
+                        ),
+                        # padding=ft.Padding(left=10, right=10, top=10, bottom=10),
+                        border=ft.BorderSide(width=1, color="black"),
+                        # border_radius=ft.BorderRadius(5, 5, 5, 5),
+                    ),
+                    ft.Container(
+                        content=ft.Column(
+                            [
+                                ft.Text("Group Messages", style="headlineMedium"),
+                                create_chat_view(group_messages, "Group Messages")
+                            ],
+                        ),
+                        # padding=ft.Padding(left=10, right=10, top=10, bottom=10),
+                        border=ft.BorderSide(width=1, color="black"),
+                        # border_radius=ft.BorderRadius(5, 5, 5, 5),
+                    )
+                ],
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                alignment=ft.MainAxisAlignment.CENTER,
+                spacing=10,
+                scroll=True,
+                expand=True
+            )
+        )
+        page.update()
+
+
+
+
+# ft.ElevatedButton("Back", on_click=lambda e: show_chat_view())
     def show_chat_view():
         page.clean()
         page.add(
@@ -360,18 +479,20 @@ def main(page: ft.Page):
             ft.Column(
                 [
                     lv,
+                    ft.Row([dropdown, cmd, send_button], alignment="start", spacing=0),
                     ft.Container(
                         content=ft.Column(
                             [
                                 ft.ElevatedButton("Private Chat", on_click=lambda e: show_private_chat_view(), width=page.width,),
                                 ft.ElevatedButton("Group Chat", on_click=lambda e: show_group_chat_view(), width=page.width,),
+                                ft.ElevatedButton("Inbox", on_click=lambda e: display_inbox_view(), width=page.width,),
                                 ft.ElevatedButton("Logout", on_click=logout_user, width=page.width)
                             ],
                             horizontal_alignment=ft.CrossAxisAlignment.CENTER
                         ),
                         alignment=ft.alignment.center
                     ),
-                    ft.Row([dropdown, cmd, send_button], alignment="start", spacing=0),
+                    
                 ],
                 expand=True,
             )

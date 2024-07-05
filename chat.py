@@ -7,6 +7,7 @@ import fcntl
 import struct
 import socket
 import threading
+import base64
 from queue import Queue
 
 class Chat:
@@ -635,8 +636,30 @@ class Chat:
 		msgs = {user: [] for user in incoming}
 		for user in incoming:
 			while not incoming[user].empty():
-				msgs[user].append(incoming[user].get_nowait())
+				message = incoming[user].get_nowait()
+				if isinstance(message, dict):
+					for key in message:
+						if isinstance(message[key], bytes):
+							try:
+								if key == 'filecontent':
+									message[key] = base64.b64encode(message[key]).decode()
+								else:
+									message[key] = message[key].decode('utf-8')
+							except UnicodeDecodeError:
+								# message[key] = message[key].decode('utf-8', errors='replace')
+								pass
+				msgs[user].append(message)
 		return {'status': 'OK', 'messages': msgs}
+	# def get_inbox(self, username):
+	# 	s_fr = self.get_user(username)
+	# 	incoming = s_fr['incoming']
+	# 	msgs = {user: [] for user in incoming}
+	# 	for user in incoming:
+	# 		while not incoming[user].empty():
+	# 			message = incoming[user].get_nowait()
+	# 			msgs[user].append(message)
+	# 	return {'status': 'OK', 'messages': msgs}
+
 
 	def send_file(self, sessionid, username_from, username_destination, filename, filecontent):
 		if sessionid not in self.sessions:
@@ -652,6 +675,7 @@ class Chat:
 			return {"status": "ERROR", "message": "User tujuan tidak berada di realm yang benar"}
 		if dest_realm != self.current_realm:
 			return self.send_message_or_file(username_from, username_dest, dest_realm, filename = filename, filecontent = filecontent)
+		filecontent = base64.b64decode(filecontent)
 		file_msg = {'msg_from': s_fr['nama'], 'realm_from': s_fr['realm'], 'msg_to': s_to['nama'], 'realm_to': s_to['realm'], 'filename': filename, 'filecontent': filecontent}
 		return self.file_sending_process(file_msg, s_fr, s_to, username_dest, filename, filecontent)
 		
@@ -681,7 +705,8 @@ class Chat:
 			return {"status": "ERROR", "message": "User tujuan tidak berada di realm yang benar"}
 		if dest_realm != self.current_realm:
 			return self.send_message_or_file(username_from, username_dest, dest_realm,group_destination=group_destination, filename=filename, filecontent=filecontent)
-		file_msg = {'msg_from': s_fr['nama'], 'realm_from': s_fr['realm'], 'msg_to': s_to['nama'], 'realm_to': s_to['realm'], 'group': group_destination, 'filename': filename}
+		filecontent = base64.b64decode(filecontent)
+		file_msg = {'msg_from': s_fr['nama'], 'realm_from': s_fr['realm'], 'msg_to': s_to['nama'], 'realm_to': s_to['realm'], 'group': group_destination, 'filename': filename, 'filecontent': filecontent}
 		return self.file_sending_process(file_msg, s_fr, s_to, username_dest, filename, filecontent)
 		
 	def sent_file_from_other_realm(self, username_from, username_dest, group_destination, filename, filecontent):
@@ -690,13 +715,15 @@ class Chat:
 		s_to = self.get_user(username_dest)
 		if not s_fr or not s_to:
 			return {'status': 'ERROR', 'message': 'User Tidak Ditemukan'}
+		filecontent = base64.b64decode(filecontent)
 		if group_destination != '':
-			file_msg = {'msg_from': s_fr['nama'], 'realm_from': s_fr['realm'], 'msg_to': s_to['nama'], 'realm_to': s_to['realm'], 'group': group_destination, 'filename': filename}
+			file_msg = {'msg_from': s_fr['nama'], 'realm_from': s_fr['realm'], 'msg_to': s_to['nama'], 'realm_to': s_to['realm'], 'group': group_destination, 'filename': filename, 'filecontent': filecontent}
 		else :
-			file_msg = {'msg_from': s_fr['nama'], 'realm_from': s_fr['realm'], 'msg_to': s_to['nama'], 'realm_to': s_to['realm'], 'filename': filename}
+			file_msg = {'msg_from': s_fr['nama'], 'realm_from': s_fr['realm'], 'msg_to': s_to['nama'], 'realm_to': s_to['realm'], 'filename': filename, 'filecontent': filecontent}
 		return self.file_sending_process(file_msg, s_fr, s_to, username_dest, filename, filecontent)
 		
 	def file_sending_process(self, file_msg, s_fr, s_to, username_dest, filename, filecontent):
+		logging.warning("filecontent: {}".format(file_msg))
 		outqueue_sender = s_fr['outgoing']
 		inqueue_receiver = s_to['incoming']
 		self._enqueue_message(outqueue_sender, inqueue_receiver, username_dest, file_msg)
@@ -716,7 +743,7 @@ class Chat:
 			if not os.path.exists(filepath):
 				break
 			counter += 1
-		with open(filepath, 'w') as f:
+		with open(filepath, 'wb') as f:
 			f.write(filecontent)
 		return {'status': 'OK', 'message': 'File Sent'}
 
