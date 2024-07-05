@@ -105,3 +105,62 @@ REGISTER
 - GAGAL:
   - status: ERROR
   - data: registrasi gagal
+
+add_realm
+* TUJUAN: untuk menambahkan suatu realm
+* PARAMETER:
+  - PARAMETER1 : name
+  - PARAMETER2 : ip
+  - PARAMETER3 : port
+* RESULT
+- BERHASIL:
+  - status: OK
+  - data: Realm berhasil ditambahkan
+- GAGAL:
+  - status: ERROR
+  - data: ~
+
+add_group
+* TUJUAN: untuk mendaftarkan pengguna
+* PARAMETER:
+  - PARAMETER1 : session id
+  - PARAMETER2 : group name
+* RESULT
+- BERHASIL:
+  - status: OK
+  - data: Add group successful
+- GAGAL:
+  - status: ERROR
+  - data: Session Tidak Ditemukan
+- GAGAL:
+  - status: ERROR
+  - data: Group tidak ditemukan!
+
+join_group
+* TUJUAN: untuk mendaftarkan pengguna
+* PARAMETER:
+  - PARAMETER1 : session id
+  - PARAMETER2 : groupname
+* RESULT
+- BERHASIL:
+  - status: OK
+  - data: Berhasil join grup
+- GAGAL:
+  - status: ERROR
+  - data: Session Tidak Ditemukan
+- GAGAL:
+  - status: ERROR
+  - data: User sudah dalam group
+
+leave_group
+* TUJUAN: untuk mendaftarkan pengguna
+* PARAMETER:
+  - PARAMETER1 : session id
+  - PARAMETER2 : group name
+* RESULT
+- BERHASIL:
+  - status: OK
+  - data: Berhasil leave dari grup
+- GAGAL:
+  - status: ERROR
+  - data: Session Tidak Ditemukan
