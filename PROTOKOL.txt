@@ -91,3 +91,17 @@ SEND_GROUP_FILE
   - status: ERROR
   - data: file tidak terkirim
 
+REGISTER
+* TUJUAN: untuk mendaftarkan pengguna
+* PARAMETER:
+  - PARAMETER1 : username
+  - PARAMETER2 : password
+  - PARAMETER3 : negara
+  - PARAMETER4 : nama
+* RESULT
+- BERHASIL:
+  - status: OK
+  - data: registrasi berhasil
+- GAGAL:
+  - status: ERROR
+  - data: registrasi gagal
