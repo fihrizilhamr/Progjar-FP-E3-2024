@@ -106,7 +106,7 @@ REGISTER
   - status: ERROR
   - data: registrasi gagal
 
-add_realm
+ADD_REALM
 * TUJUAN: untuk menambahkan suatu realm
 * PARAMETER:
   - PARAMETER1 : name
@@ -120,7 +120,7 @@ add_realm
   - status: ERROR
   - data: ~
 
-add_group
+ADD_GROUP
 * TUJUAN: untuk mendaftarkan pengguna
 * PARAMETER:
   - PARAMETER1 : session id
@@ -136,7 +136,7 @@ add_group
   - status: ERROR
   - data: Group tidak ditemukan!
 
-join_group
+JOIN_GROUP
 * TUJUAN: untuk mendaftarkan pengguna
 * PARAMETER:
   - PARAMETER1 : session id
@@ -152,7 +152,7 @@ join_group
   - status: ERROR
   - data: User sudah dalam group
 
-leave_group
+LEAVE_GROUP
 * TUJUAN: untuk mendaftarkan pengguna
 * PARAMETER:
   - PARAMETER1 : session id
