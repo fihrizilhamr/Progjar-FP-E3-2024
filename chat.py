@@ -126,7 +126,7 @@ class Chat:
 				for user_name, user_info in self.users.items():
 					list_users.append(user_name+"@"+user_info['realm'])
 				logging.warning("LISTUSERS: server data: users={}".format(list_users))
-				return list_users
+				return {'status': 'OK', 'users': list_users}
 			
 			elif command == 'list_my_groups':
 				sessionid = j[1].strip()
@@ -139,7 +139,7 @@ class Chat:
 					if user_test in group_info['members']:
 						my_groups.append(group_name)
 				logging.warning("LISTMYGROUPS: server data: users={} groups={}".format(user_test, my_groups))
-				return my_groups
+				return {'status': 'OK', 'groups': my_groups}
 
 			
 			elif (command=='add_realm'):

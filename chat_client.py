@@ -193,16 +193,14 @@ class ChatClient:
             return "Error, not authorized"
         string="list_users\r\n"
         result = self.send_string(string)
-        return result
+        return "{}".format(result['users'])
     
     def list_my_groups(self):
         if self.tokenid == "":
             return "Error, not authorized"
         string="list_my_groups {}\r\n".format(self.tokenid)
         result = self.send_string(string)
-        return result
-
-
+        return "{}".format(result['groups'])
 
     def list_group(self, groupname):
         if self.tokenid == "":

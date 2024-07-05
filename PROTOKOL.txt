@@ -164,3 +164,35 @@ leave_group
 - GAGAL:
   - status: ERROR
   - data: Session Tidak Ditemukan
+
+LIST_USERS
+* TUJUAN: untuk mendapatkan semua pengguna
+* PARAMETER: tidak ada
+* RESULT
+- BERHASIL:
+  - status: OK
+  - users: ['user1', 'user2, 'user3', ...]
+- GAGAL: tidak ada
+
+LIST_MY_GROUPS
+* TUJUAN: untuk mendaftarkan semua grup pengguna
+* PARAMETER:
+  - PARAMETER1 : session id
+* RESULT
+- BERHASIL:
+  - status: OK
+  - users: ['group1', 'group2, 'group3', ...]
+- GAGAL: tidak ada
+
+LIST_GROUP
+* TUJUAN: untuk mendapatkan semua member dalam grup
+* PARAMETER: tidak ada
+* RESULT
+- BERHASIL:
+  - status: OK
+  - groups: ['member1', 'member2, 'member3', ...]
+- GAGAL:
+  - status: ERROR
+  - data: Group tidak ditemukan
+  - status: ERROR
+  - data: Bukan anggota grup
